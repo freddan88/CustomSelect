@@ -8,29 +8,47 @@ interface IData {
 }
 
 interface IProps {
+  initialData?: IData;
   data: IData[];
 }
 
 const CustomSelect: React.FC<IProps> = (props) => {
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [dropdownLabel, setDropdownLabel] = useState<string>("Select value");
-  const [dropdownValue, setDropdownValue] = useState<any>();
+
   const dropdownHeaderRef = useRef<HTMLDivElement>(null);
   const dropdownMenuRef = useRef<HTMLDivElement>(null);
 
   const dropdownHeadClass = dropdownOpen ? "open" : "";
 
   useEffect(() => {
-    window.addEventListener("mousedown", handleBlurClose);
     return () => {
       window.removeEventListener("mousedown", handleBlurClose);
     };
   }, []);
 
   useEffect(() => {
-    if (!dropdownValue) return;
-    console.log(dropdownValue);
-  }, [dropdownValue]);
+    if (props.initialData && typeof props.initialData === "object") {
+      const { label } = props.initialData;
+      setDropdownLabel(label);
+    }
+  }, [props.initialData]);
+
+  useEffect(() => {
+    if (dropdownOpen) {
+      window.addEventListener("mousedown", handleBlurClose);
+    } else {
+      window.removeEventListener("mousedown", handleBlurClose);
+    }
+  }, [dropdownOpen]);
+
+  useEffect(() => {
+    if (!dropdownLabel) return;
+    const obj = props.data.find((obj: any) => obj.label === dropdownLabel);
+    if (obj && obj.hasOwnProperty("value")) {
+      console.log(obj.value);
+    }
+  }, [dropdownLabel, props.data]);
 
   const handleBlurClose = (e: any) => {
     if (!dropdownHeaderRef?.current) return;
@@ -46,9 +64,8 @@ const CustomSelect: React.FC<IProps> = (props) => {
   };
 
   const handleSelectedValue = (e: any) => {
-    if (e?.target?.dataset?.value) {
-      const { label, value } = e.target.dataset;
-      setDropdownValue(value);
+    if (e?.target?.dataset?.label) {
+      const { label } = e.target.dataset;
       setDropdownLabel(label);
       setDropdownOpen(false);
     }
@@ -60,12 +77,11 @@ const CustomSelect: React.FC<IProps> = (props) => {
     }
   };
 
-  const navigateWithKeyboard = (e: any) => {
-    if (e?.target?.dataset?.value) {
-      const { label, value } = e.target.dataset;
+  const selectWithKeyboard = (e: any) => {
+    if (e?.target?.dataset?.label) {
+      const { label } = e.target.dataset;
       // Key: Enter
       if (e && e.keyCode === 13) {
-        setDropdownValue(value);
         setDropdownLabel(label);
         setDropdownOpen(false);
       }
@@ -76,14 +92,17 @@ const CustomSelect: React.FC<IProps> = (props) => {
     if (props.data && Array.isArray(props.data)) {
       const { data } = props;
       return data.map((obj, index) => {
+        let activeClass = "";
+        if (obj.label === dropdownLabel) {
+          activeClass = "active";
+        }
         return (
           <li
             key={index}
-            className="custom-select-dropdown-item"
-            onClick={handleSelectedValue}
-            data-label={obj.label}
-            data-value={obj.value}
             tabIndex={0}
+            data-label={obj.label}
+            className={`custom-select-dropdown-item ${activeClass}`}
+            onClick={handleSelectedValue}
           >
             {obj.label}
           </li>
@@ -103,7 +122,7 @@ const CustomSelect: React.FC<IProps> = (props) => {
         >
           <input autoFocus type="search" placeholder="Search" />
           <ul
-            onKeyDown={navigateWithKeyboard}
+            onKeyDown={selectWithKeyboard}
             className="custom-select-dropdown-list"
           >
             {renderDropdownList()}

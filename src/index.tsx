@@ -6,18 +6,31 @@ import reportWebVitals from "./reportWebVitals";
 
 const array = [
   {
-    value: 1,
-    label: "hej1",
+    label: "Option 1",
+    value: { id: 1, name: "Hello" },
   },
   {
     value: 2,
-    label: "hej2",
+    label: "Option 2",
+  },
+  {
+    value: 3,
+    label: "Option 3",
+  },
+  {
+    value: 4,
+    label: "Option 4",
   },
 ];
 
+const initialOption = {
+  label: "Option 1",
+  value: { id: 1, name: "Hello" },
+};
+
 ReactDOM.render(
   <React.StrictMode>
-    <CustomSelect data={array} />
+    <CustomSelect data={array} initialData={initialOption} />
   </React.StrictMode>,
   document.getElementById("root")
 );
