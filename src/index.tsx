@@ -51,6 +51,32 @@ const selectData = [
 ReactDOM.render(
   <React.StrictMode>
     <CustomSelect data={array} initialData={initialOption} />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
     <InputFieldSelect options={selectData} name="brands" />
   </React.StrictMode>,
   document.getElementById("root")
