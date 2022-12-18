@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import CustomSelect from "./CustomSelect/CustomSelect";
 import reportWebVitals from "./reportWebVitals";
+import InputFieldSelect from "./inputFields/inputFieldSelect/InputFieldSelect";
 
 const array = [
   {
@@ -28,9 +29,29 @@ const initialOption = {
   value: { id: 1, name: "Hello" },
 };
 
+const selectData = [
+  {
+    label: "DELL",
+    value: "dell",
+  },
+  {
+    label: "HP",
+    value: "hp",
+  },
+  {
+    label: "ASUS",
+    value: "asus",
+  },
+  {
+    label: "ACER",
+    value: "acer",
+  },
+];
+
 ReactDOM.render(
   <React.StrictMode>
     <CustomSelect data={array} initialData={initialOption} />
+    <InputFieldSelect options={selectData} name="brands" />
   </React.StrictMode>,
   document.getElementById("root")
 );
