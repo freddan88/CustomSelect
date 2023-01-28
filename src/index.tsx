@@ -4,6 +4,7 @@ import "./index.css";
 import CustomSelect from "./CustomSelect/CustomSelect";
 import reportWebVitals from "./reportWebVitals";
 import InputFieldSelect from "./inputFields/inputFieldSelect/InputFieldSelect";
+import SingleSelectField from "./SingleSelect/SingleSelectField";
 
 const array = [
   {
@@ -53,31 +54,10 @@ ReactDOM.render(
     <CustomSelect data={array} initialData={initialOption} />
     <br />
     <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
     <InputFieldSelect options={selectData} name="brands" />
+    <br />
+    <br />
+    <SingleSelectField />
   </React.StrictMode>,
   document.getElementById("root")
 );

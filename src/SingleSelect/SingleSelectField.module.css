@@ -1,0 +1,60 @@
+.selectFieldTrigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 8px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  max-width: 300px;
+  width: 100%;
+}
+
+.selectFieldTrigger:focus {
+  border-color: blue;
+}
+
+.selectFieldMenu {
+  position: fixed;
+  border-radius: 8px;
+  border: 1px solid blue;
+  background-color: #ffffff;
+  overflow-x: hidden;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-top: 4px;
+  z-index: 10;
+}
+
+.selectFieldMenu ul,
+.selectFieldMenu li {
+  list-style: none;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+}
+
+.selectFieldMenu ul {
+  padding: 8px 0;
+}
+
+.selectFieldMenu li {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.selectFieldMenu input {
+  display: none;
+}
+
+.selectFieldMenu label {
+  padding: 4px 8px;
+  cursor: pointer;
+  display: block;
+  flex-grow: 1;
+}
+
+.selectFieldMenu input:checked ~ label {
+  background-color: aqua;
+}
