@@ -4,14 +4,10 @@
   align-items: center;
   min-height: 38px;
   padding: 0 8px;
-  border: 1px solid #cccccc;
+  border: 1px solid transparent;
   border-radius: 8px;
   max-width: 300px;
   width: 100%;
-}
-
-.selectFieldTrigger:focus {
-  border-color: blue;
 }
 
 .selectFieldMenu {
@@ -38,14 +34,14 @@
   padding: 8px 0;
 }
 
+.selectFieldMenu ul input {
+  display: none;
+}
+
 .selectFieldMenu li {
   align-items: center;
   display: flex;
   gap: 8px;
-}
-
-.selectFieldMenu input {
-  display: none;
 }
 
 .selectFieldMenu label {

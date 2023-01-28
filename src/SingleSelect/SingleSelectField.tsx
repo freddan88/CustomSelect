@@ -23,6 +23,7 @@ const SingleSelectField: React.FC<IProps> = (props) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const searchInputRef: RefObject<HTMLInputElement> = useRef(null);
   const selectTriggerRef: RefObject<HTMLButtonElement> = useRef(null);
   const selectedOptionsRef: MutableRefObject<string[]> = useRef([]);
 
@@ -57,10 +58,15 @@ const SingleSelectField: React.FC<IProps> = (props) => {
       <button
         type="button"
         id={fieldId}
+        style={{ borderColor: isOpen ? "blue" : "#cccccc" }}
         className={styles.selectFieldTrigger}
         ref={selectTriggerRef}
         onClick={handleSelectClick}
-        onBlur={() => setIsOpen(false)}
+        onBlur={(e) => {
+          if (e.relatedTarget === searchInputRef.current) return;
+          if (e.target === searchInputRef.current) return;
+          setIsOpen(false);
+        }}
       >
         <span style={{ pointerEvents: "none" }}>Selected option</span>
         <MdUnfoldMore style={{ pointerEvents: "none" }} size={20} />
@@ -73,6 +79,14 @@ const SingleSelectField: React.FC<IProps> = (props) => {
             }}
             className={styles.selectFieldMenu}
           >
+            <div style={{ padding: "8px", paddingBottom: 0 }}>
+              <input
+                type="search"
+                ref={searchInputRef}
+                style={{ width: "100%", marginTop: "8px" }}
+              />
+              {/* Search using regex: https://www.youtube.com/watch?v=1iysNUrI3lw */}
+            </div>
             <ul>
               <li>
                 <input
