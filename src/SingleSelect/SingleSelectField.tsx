@@ -1,6 +1,7 @@
 import React, {
   useState,
   MouseEvent,
+  FocusEvent,
   useRef,
   RefObject,
   ChangeEvent,
@@ -9,23 +10,58 @@ import React, {
 import { MdUnfoldMore } from "react-icons/md";
 import styles from "./SingleSelectField.module.css";
 
-interface IProps {}
+interface IValue<T> {
+  name: string;
+  value: T;
+}
 
-const fieldId = "single-select-field";
-const fieldName1 = "single-select-field-name-1";
-const fieldName2 = "single-select-field-name-2";
+interface IOption {
+  label: string;
+  value: string;
+  disabled?: boolean;
+}
+
+type TSingleSelect = {
+  isMulti?: never;
+  value?: string;
+};
+
+type TMultiSelect = {
+  isMulti: true;
+  value?: string[];
+};
+
+type TProps = {
+  name: string;
+  label: string;
+  options: IOption[];
+  onChange: (value: IValue<string[] | string>) => void;
+  disabled?: boolean;
+  placeholder?: string;
+  isSearchable?: boolean;
+} & (TSingleSelect | TMultiSelect);
 
 let selectElementPositions = { bottom: 0, left: 0, width: 0 };
 
-const multiSelect = false;
-
-const SingleSelectField: React.FC<IProps> = (props) => {
+const SingleSelectField: React.FC<TProps> = ({
+  name,
+  label,
+  options,
+  onChange,
+  value,
+  placeholder,
+  isSearchable,
+  disabled,
+  isMulti,
+}) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const searchInputRef: RefObject<HTMLInputElement> = useRef(null);
   const selectTriggerRef: RefObject<HTMLButtonElement> = useRef(null);
   const selectedOptionsRef: MutableRefObject<string[]> = useRef([]);
+
+  const fieldId = `select-field-${name}`.toLowerCase();
 
   const handleSelectClick = (e: MouseEvent<HTMLButtonElement>) => {
     const selectButton = e.target as HTMLElement;
@@ -39,22 +75,43 @@ const SingleSelectField: React.FC<IProps> = (props) => {
 
   const handleOptionSelect = (e: ChangeEvent<HTMLInputElement>) => {
     const inputElement = e.target as HTMLInputElement;
-    const { value, checked, name } = inputElement;
-    if (multiSelect) {
+    const { value: inputValue, name: inputName, checked } = inputElement;
+    if (isMulti) {
       selectedOptionsRef.current = checked
-        ? [...selectedOptionsRef.current, value]
-        : selectedOptionsRef.current.filter((item) => item !== value);
+        ? [...selectedOptionsRef.current, inputValue]
+        : selectedOptionsRef.current.filter((item) => item !== inputValue);
       setSelectedOptions(selectedOptionsRef.current);
-      console.log({ name, value: selectedOptionsRef.current });
+      onChange({ name: inputName, value: selectedOptionsRef.current });
     } else {
-      setSelectedOptions([value]);
-      console.log({ name, value });
+      setSelectedOptions([inputValue]);
+      onChange({ name: inputName, value: inputValue });
     }
+  };
+
+  const handleInputsBlur = (e: FocusEvent) => {
+    e.stopPropagation();
+    const relatedElement = e.relatedTarget as HTMLElement;
+    if (relatedElement === searchInputRef.current) return;
+    if (relatedElement) return;
+    setIsOpen(false);
+  };
+
+  const getSelectedLabel = () => {
+    if (isMulti) {
+      return selectedOptions.length > 0
+        ? options.map((option) => {
+            return selectedOptions.find((item) => item === option.value);
+          })
+        : placeholder;
+    }
+    return selectedOptions.length > 0
+      ? options.find((obj) => obj.value === selectedOptions[0])?.label
+      : placeholder;
   };
 
   return (
     <div style={{ margin: "10px" }}>
-      <label htmlFor={fieldId}>Single Select Field</label>
+      <label htmlFor={fieldId}>{label}</label>
       <button
         type="button"
         id={fieldId}
@@ -62,13 +119,10 @@ const SingleSelectField: React.FC<IProps> = (props) => {
         className={styles.selectFieldTrigger}
         ref={selectTriggerRef}
         onClick={handleSelectClick}
-        onBlur={(e) => {
-          if (e.relatedTarget === searchInputRef.current) return;
-          if (e.target === searchInputRef.current) return;
-          setIsOpen(false);
-        }}
+        disabled={disabled}
+        onBlur={handleInputsBlur}
       >
-        <span style={{ pointerEvents: "none" }}>Selected option</span>
+        <span style={{ pointerEvents: "none" }}>{getSelectedLabel()}</span>
         <MdUnfoldMore style={{ pointerEvents: "none" }} size={20} />
         {isOpen && (
           <div
@@ -84,34 +138,31 @@ const SingleSelectField: React.FC<IProps> = (props) => {
                 type="search"
                 ref={searchInputRef}
                 style={{ width: "100%", marginTop: "8px" }}
+                onFocus={(e) => e.stopPropagation()}
+                onBlur={handleInputsBlur}
               />
               {/* Search using regex: https://www.youtube.com/watch?v=1iysNUrI3lw */}
             </div>
             <ul>
-              <li>
-                <input
-                  type={multiSelect ? "checkbox" : "radio"}
-                  id={fieldName1}
-                  name={fieldName1}
-                  value={fieldName1}
-                  checked={selectedOptions.includes(fieldName1)}
-                  onFocus={(e) => e.stopPropagation()}
-                  onChange={handleOptionSelect}
-                />
-                <label htmlFor={fieldName1}>Option #1</label>
-              </li>
-              <li>
-                <input
-                  type={multiSelect ? "checkbox" : "radio"}
-                  id={fieldName2}
-                  name={fieldName1}
-                  value={fieldName2}
-                  checked={selectedOptions.includes(fieldName2)}
-                  onFocus={(e) => e.stopPropagation()}
-                  onChange={handleOptionSelect}
-                />
-                <label htmlFor={fieldName2}>Option #2</label>
-              </li>
+              {options.map((option) => {
+                return (
+                  <li key={option.value}>
+                    <input
+                      type={isMulti ? "checkbox" : "radio"}
+                      id={option.value}
+                      name={name}
+                      value={option.value}
+                      data-label={option.label}
+                      checked={selectedOptions.includes(option.value)}
+                      onFocus={(e) => e.stopPropagation()}
+                      onBlur={(e) => e.stopPropagation()}
+                      onChange={handleOptionSelect}
+                      disabled={option.disabled}
+                    />
+                    <label htmlFor={option.value}>{option.label}</label>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}

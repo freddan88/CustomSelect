@@ -57,7 +57,17 @@ ReactDOM.render(
     <InputFieldSelect options={selectData} name="brands" />
     <br />
     <br />
-    <SingleSelectField />
+    <SingleSelectField
+      label="Custom Select"
+      name="testSelect"
+      onChange={(value) => console.log(value)}
+      placeholder="Select your option..."
+      value="1"
+      options={[
+        { label: "Option #1", value: "1" },
+        { label: "Option #2", value: "2" },
+      ]}
+    />
   </React.StrictMode>,
   document.getElementById("root")
 );
