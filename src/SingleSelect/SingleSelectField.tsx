@@ -36,6 +36,7 @@ type TProps = {
   label: string;
   options: IOption[];
   onChange: (value: IValue<string[] | string>) => void;
+  stayOpen?: boolean;
   disabled?: boolean;
   placeholder?: string;
   isSearchable?: boolean;
@@ -49,6 +50,7 @@ const SingleSelectField: React.FC<TProps> = ({
   options,
   onChange,
   value,
+  stayOpen,
   placeholder,
   isSearchable,
   disabled,
@@ -86,6 +88,8 @@ const SingleSelectField: React.FC<TProps> = ({
       setSelectedOptions([inputValue]);
       onChange({ name: inputName, value: inputValue });
     }
+    if (isMulti || stayOpen) return;
+    setIsOpen(false);
   };
 
   const handleInputsBlur = (e: FocusEvent) => {
@@ -123,6 +127,7 @@ const SingleSelectField: React.FC<TProps> = ({
         onClick={handleSelectClick}
         disabled={disabled}
         onBlur={handleInputsBlur}
+        onKeyDown={(e) => console.log(e.code)}
       >
         <span style={{ pointerEvents: "none" }}>{getSelectedLabel()}</span>
         <MdUnfoldMore style={{ pointerEvents: "none" }} size={20} />
