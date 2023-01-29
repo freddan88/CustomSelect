@@ -63,6 +63,7 @@ ReactDOM.render(
       onChange={(value) => console.log(value)}
       placeholder="Select your option..."
       value="1"
+      isSearchable
       options={[
         { label: "Option #1", value: "1" },
         { label: "Option #2", value: "2" },

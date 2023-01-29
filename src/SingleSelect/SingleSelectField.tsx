@@ -91,7 +91,9 @@ const SingleSelectField: React.FC<TProps> = ({
   const handleInputsBlur = (e: FocusEvent) => {
     e.stopPropagation();
     const relatedElement = e.relatedTarget as HTMLElement;
-    if (relatedElement === searchInputRef.current) return;
+    if (searchInputRef.current) {
+      if (relatedElement === searchInputRef.current) return;
+    }
     if (relatedElement) return;
     setIsOpen(false);
   };
@@ -133,16 +135,18 @@ const SingleSelectField: React.FC<TProps> = ({
             }}
             className={styles.selectFieldMenu}
           >
-            <div style={{ padding: "8px", paddingBottom: 0 }}>
-              <input
-                type="search"
-                ref={searchInputRef}
-                style={{ width: "100%", marginTop: "8px" }}
-                onFocus={(e) => e.stopPropagation()}
-                onBlur={handleInputsBlur}
-              />
-              {/* Search using regex: https://www.youtube.com/watch?v=1iysNUrI3lw */}
-            </div>
+            {isSearchable && (
+              <div style={{ padding: "8px", paddingBottom: 0 }}>
+                <input
+                  type="search"
+                  ref={searchInputRef}
+                  style={{ width: "100%", marginTop: "8px" }}
+                  onFocus={(e) => e.stopPropagation()}
+                  onBlur={handleInputsBlur}
+                />
+                {/* Search using regex: https://www.youtube.com/watch?v=1iysNUrI3lw */}
+              </div>
+            )}
             <ul>
               {options.map((option) => {
                 return (
