@@ -5,6 +5,7 @@ import CustomSelect from "./CustomSelect/CustomSelect";
 import reportWebVitals from "./reportWebVitals";
 import InputFieldSelect from "./inputFields/inputFieldSelect/InputFieldSelect";
 import SingleSelectField from "./SingleSelect/SingleSelectField";
+import PortalSelect from "./PortalSelect/PortalSelect";
 
 const array = [
   {
@@ -77,6 +78,30 @@ ReactDOM.render(
       <option value="3">3</option>
       <option value="4">4</option>
     </select>
+    <br />
+    <br />
+    <div style={{ margin: "8px" }}>
+      <PortalSelect
+        name="fixed-test"
+        placeholder="välj..."
+        options={[
+          {
+            label: "Zero",
+            value: 0,
+          },
+          {
+            label: "One",
+            value: 1,
+          },
+          {
+            label: "Two",
+            value: 2,
+          },
+        ]}
+      />
+    </div>
+    <br />
+    <br />
   </React.StrictMode>,
   document.getElementById("root")
 );
