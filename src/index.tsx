@@ -84,6 +84,8 @@ ReactDOM.render(
       <PortalSelect
         name="fixed-test"
         placeholder="välj..."
+        searchable={false}
+        stayOpen={false}
         options={[
           {
             label: "Zero",

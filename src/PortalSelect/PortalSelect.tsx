@@ -8,14 +8,15 @@ import React, {
 } from "react";
 import styles from "./portalSelect.module.css";
 import { MdUnfoldMore } from "react-icons/md";
+import useSelectFieldKeyboard from "./useSelectFieldKeyboard";
 
-interface IOption {
+export interface IOption {
   label: string;
   value: string | number;
   disabled?: boolean;
 }
 
-interface IProps {
+export interface IProps {
   name: string;
   options: IOption[];
   label?: string;
@@ -24,6 +25,7 @@ interface IProps {
   placeholder?: string;
   searchable?: boolean;
   multiple?: boolean;
+  stayOpen?: boolean;
 }
 
 export let selectBoxPositions: DOMRect | undefined;
@@ -36,23 +38,35 @@ const PortalSelect: React.FC<IProps> = ({
   value = "",
   placeholder = "",
   label = undefined,
+  stayOpen = false,
   disabled = false,
   multiple = false,
   searchable = false,
 }) => {
   const [searchedOptions, setSearchedOptions] = useState<IOption[]>();
-  const [selectedOption, setSelectedOption] = useState<IOption>();
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
+  const [selected, setSelected] = useState<IOption>();
   const [menuMargin, setMenuMargin] = useState(MENU_GAP);
   const [isOpen, setIsOpen] = useState(false);
 
   const selectMenuRef: RefObject<HTMLDivElement> = useRef(null);
+  const selectOptionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const renderSelectedLabel = () => {
-    if (selectedOption) {
+    if (selected) {
       if (multiple) return <div>Multiple</div>;
-      return <span></span>;
+      return <span style={{ userSelect: "none" }}>{selected.label}</span>;
     }
     return <span className={styles.placeholder}>{placeholder}</span>;
+  };
+
+  const handleSelect = (checked: boolean, option: IOption) => {
+    if (multiple) {
+    } else {
+      setSelected(option);
+    }
+    if (stayOpen) return;
+    setIsOpen(false);
   };
 
   const handleSelectBoxClick = (e: MouseEvent<HTMLElement>) => {
@@ -63,9 +77,23 @@ const PortalSelect: React.FC<IProps> = ({
     setIsOpen((prevOpen) => !prevOpen);
   };
 
-  const handleCloseOutside = useCallback(() => {
-    setIsOpen(false);
+  const handleCloseOutside = useCallback((e: globalThis.MouseEvent) => {
+    const clickedElement = e.target as HTMLElement;
+    if (selectMenuRef.current && clickedElement) {
+      if (selectMenuRef.current.contains(clickedElement)) return;
+      setIsOpen(false);
+    }
   }, []);
+
+  const { handleKeyboard } = useSelectFieldKeyboard(
+    setHighlightedIndex,
+    selectOptionRefs,
+    selectMenuRef,
+    handleSelect,
+    searchable,
+    setIsOpen,
+    isOpen
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -76,10 +104,19 @@ const PortalSelect: React.FC<IProps> = ({
   }, [isOpen, handleCloseOutside]);
 
   useEffect(() => {
+    if (isOpen && selectOptionRefs.current) {
+      const button = selectOptionRefs.current[
+        highlightedIndex
+      ] as HTMLButtonElement;
+      if (button) button.focus();
+    }
+  }, [isOpen, highlightedIndex]);
+
+  useEffect(() => {
     if (isOpen && selectBoxPositions && selectMenuRef.current) {
       const boxHeight = selectBoxPositions.height;
       const menuHeight = selectMenuRef.current.clientHeight;
-      const menuMargin = menuHeight + boxHeight + MENU_GAP;
+      const menuMargin = menuHeight + boxHeight + MENU_GAP + 2;
       // setMenuMargin(-menuMargin);
       // setMenuMargin(MENU_GAP);
     }
@@ -91,38 +128,49 @@ const PortalSelect: React.FC<IProps> = ({
         tabIndex={0}
         className={isOpen ? styles.selectBoxOpen : styles.selectBox}
         onClick={handleSelectBoxClick}
+        onKeyDown={handleKeyboard}
       >
         {renderSelectedLabel()}
         <MdUnfoldMore />
       </div>
       {isOpen && selectBoxPositions && (
         <div
-          onClickCapture={(e) => e.stopPropagation()}
+          onKeyDown={handleKeyboard}
           className={styles.selectMenu}
           ref={selectMenuRef}
           style={{
             marginTop: menuMargin,
-            // top: selectBoxPositions.bottom + MENU_GAP,
+            top: selectBoxPositions.bottom,
             width: selectBoxPositions.width,
             left: selectBoxPositions.left,
           }}
         >
-          <div className={styles.searchInputContainer}>
-            <input type="search" className={styles.searchInput} />
-          </div>
+          {searchable && (
+            <div className={styles.searchInputContainer}>
+              <input
+                type="search"
+                placeholder="Search..."
+                className={styles.searchInput}
+              />
+            </div>
+          )}
           <ul className={styles.selectList}>
-            {options.map((option) => {
+            {options.map((option, index) => {
+              const isSelected = option.value === selected?.value;
               return (
                 <li key={option.value}>
-                  <label>
-                    <input
-                      type="radio"
-                      name={name}
-                      disabled={option.disabled}
-                      style={{ display: "none" }}
-                    />
+                  <button
+                    type="button"
+                    ref={(ref) => (selectOptionRefs.current[index] = ref)}
+                    onClick={() => handleSelect(isSelected, option)}
+                    disabled={disabled}
+                    name={name}
+                    className={
+                      isSelected ? styles.optionSelected : styles.option
+                    }
+                  >
                     {option.label}
-                  </label>
+                  </button>
                 </li>
               );
             })}

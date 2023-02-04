@@ -7,6 +7,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 8px;
+  outline: none;
 }
 
 .selectBox:focus,
@@ -33,7 +34,7 @@
   border-radius: 8px;
   z-index: 80;
   overflow: hidden;
-  padding-bottom: 8px;
+  padding: 8px 0;
   background-color: white;
 }
 
@@ -43,6 +44,7 @@
 
 .selectMenu .searchInputContainer {
   padding: 8px;
+  padding-top: 0;
 }
 
 .selectList {
@@ -51,12 +53,23 @@
   margin: 0;
 }
 
-.selectList label {
+.selectList button {
   cursor: pointer;
   display: block;
   padding: 4px 8px;
+  user-select: none;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background-color: white;
+  outline: none;
 }
 
-.selectList label:hover {
+.selectList .option:hover,
+.selectList .option:focus {
   background-color: aliceblue;
+}
+
+.selectList .optionSelected {
+  background-color: cadetblue;
 }
