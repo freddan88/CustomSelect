@@ -17,15 +17,33 @@
 
 .selectBox *,
 .selectBoxOpen * {
-  line-height: 0;
+  user-select: none;
   padding: 0;
   margin: 0;
 }
 
 .selectBox > .placeholder,
 .selectBoxOpen > .placeholder {
-  user-select: none;
   color: #ccc;
+}
+
+.multiSelectBadges {
+  flex-wrap: wrap;
+  display: flex;
+  gap: 4px;
+}
+
+.multiSelectBadges button {
+  background-color: #ccc;
+  border-radius: 4px;
+  padding: 2px 4px;
+  display: block;
+  border: none;
+}
+
+.multiSelectBadges button:hover {
+  background-color: red;
+  cursor: pointer;
 }
 
 .selectMenu {

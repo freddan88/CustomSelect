@@ -80,7 +80,36 @@ ReactDOM.render(
     </select>
     <br />
     <br />
-    <div style={{ margin: "8px" }}>
+    <div
+      style={{
+        gap: "8px",
+        margin: "8px",
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+      }}
+    >
+      <PortalSelect
+        name="fixed-test"
+        placeholder="välj..."
+        value={[1, 2]}
+        searchable={false}
+        stayOpen={true}
+        multiple
+        options={[
+          {
+            label: "Zero",
+            value: 0,
+          },
+          {
+            label: "One",
+            value: 1,
+          },
+          {
+            label: "Two",
+            value: 2,
+          },
+        ]}
+      />
       <PortalSelect
         name="fixed-test"
         placeholder="välj..."

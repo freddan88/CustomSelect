@@ -12,7 +12,7 @@ export default function useSelectFieldKeyboard(
   setIsOpen: Dispatch<SetStateAction<boolean>>,
   isOpen: boolean
 ) {
-  const handleKeyboard = (e: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyboard = (e: KeyboardEvent<HTMLElement>) => {
     if (e.target instanceof HTMLInputElement) return;
     switch (e.code) {
       case "Enter":
