@@ -10,33 +10,41 @@ import styles from "./portalSelect.module.css";
 import { MdUnfoldMore } from "react-icons/md";
 import useSelectFieldKeyboard from "./useSelectFieldKeyboard";
 
+interface IMultiSelect {
+  multiple: true;
+  value?: (string | number)[];
+}
+
+interface ISingleSelect {
+  multiple?: false;
+  value?: string | number;
+}
+
 export interface IOption {
   label: string;
   value: string | number;
   disabled?: boolean;
 }
 
-export interface IProps {
+export type TProps = {
   name: string;
   options: IOption[];
   label?: string;
-  value?: string | number;
   disabled?: boolean;
   placeholder?: string;
   searchable?: boolean;
-  multiple?: boolean;
   stayOpen?: boolean;
-}
+} & (ISingleSelect | IMultiSelect);
 
 export let selectBoxPositions: DOMRect | undefined;
 
 const MENU_GAP = 4; // Gap beetwen selectBox and selectMenu in px
 
-const PortalSelect: React.FC<IProps> = ({
+const PortalSelect: React.FC<TProps> = ({
   name,
   options,
-  value = "",
   placeholder = "",
+  value = undefined,
   label = undefined,
   stayOpen = false,
   disabled = false,
@@ -45,7 +53,7 @@ const PortalSelect: React.FC<IProps> = ({
 }) => {
   const [searchedOptions, setSearchedOptions] = useState<IOption[]>();
   const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const [selected, setSelected] = useState<IOption>();
+  const [selected, setSelected] = useState<IOption[]>([]);
   const [menuMargin, setMenuMargin] = useState(MENU_GAP);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -53,17 +61,23 @@ const PortalSelect: React.FC<IProps> = ({
   const selectOptionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const renderSelectedLabel = () => {
-    if (selected) {
+    if (selected.length > 0) {
       if (multiple) return <div>Multiple</div>;
-      return <span style={{ userSelect: "none" }}>{selected.label}</span>;
+      return <span style={{ userSelect: "none" }}>{selected[0].label}</span>;
     }
     return <span className={styles.placeholder}>{placeholder}</span>;
   };
 
   const handleSelect = (checked: boolean, option: IOption) => {
     if (multiple) {
+      setSelected((prevValues) => {
+        if (checked) {
+          return prevValues.filter((obj) => obj.value !== option.value);
+        }
+        return [...prevValues, option];
+      });
     } else {
-      setSelected(option);
+      setSelected([option]);
     }
     if (stayOpen) return;
     setIsOpen(false);
@@ -122,6 +136,22 @@ const PortalSelect: React.FC<IProps> = ({
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (selected.length > 0) return;
+    if (multiple && Array.isArray(value)) {
+      const newSelections = options.filter((option) =>
+        value.includes(option.value)
+      );
+      console.log(newSelections);
+    } else {
+      const index = options.findIndex((option) => option.value === value);
+      if (index > 0) {
+        setHighlightedIndex(index);
+        setSelected([options[index]]);
+      }
+    }
+  }, [value, options, multiple, selected]);
+
   return (
     <>
       <div
@@ -156,13 +186,15 @@ const PortalSelect: React.FC<IProps> = ({
           )}
           <ul className={styles.selectList}>
             {options.map((option, index) => {
-              const isSelected = option.value === selected?.value;
+              const isSelected = Boolean(
+                selected?.find((obj) => obj.value === option.value)
+              );
               return (
                 <li key={option.value}>
                   <button
                     type="button"
                     ref={(ref) => (selectOptionRefs.current[index] = ref)}
-                    onClick={() => handleSelect(isSelected, option)}
+                    onClick={() => handleSelect(false, option)}
                     disabled={disabled}
                     name={name}
                     className={

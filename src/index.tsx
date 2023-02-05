@@ -84,6 +84,7 @@ ReactDOM.render(
       <PortalSelect
         name="fixed-test"
         placeholder="välj..."
+        value={1}
         searchable={false}
         stayOpen={false}
         options={[
