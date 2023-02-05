@@ -89,7 +89,8 @@ ReactDOM.render(
       }}
     >
       <PortalSelect
-        name="fixed-test"
+        name="fixed-test1"
+        label="Test label 1"
         placeholder="välj..."
         value={[1, 2]}
         searchable={false}
@@ -111,7 +112,8 @@ ReactDOM.render(
         ]}
       />
       <PortalSelect
-        name="fixed-test"
+        name="fixed-test2"
+        label="Test label 2"
         placeholder="välj..."
         value={1}
         searchable={false}

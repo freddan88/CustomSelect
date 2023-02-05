@@ -8,6 +8,7 @@
   justify-content: space-between;
   padding: 0 8px;
   outline: none;
+  width: 100%;
 }
 
 .selectBox:focus,
@@ -28,12 +29,13 @@
 }
 
 .multiSelectBadges {
+  list-style: none;
   flex-wrap: wrap;
   display: flex;
   gap: 4px;
 }
 
-.multiSelectBadges button {
+.multiSelectBadges li {
   background-color: #ccc;
   border-radius: 4px;
   padding: 2px 4px;
@@ -41,19 +43,14 @@
   border: none;
 }
 
-.multiSelectBadges button:hover {
+.multiSelectBadges li:hover {
   background-color: red;
   cursor: pointer;
 }
 
 .selectMenu {
   position: fixed;
-  border: 1px solid cadetblue;
-  border-radius: 8px;
   z-index: 80;
-  overflow: hidden;
-  padding: 8px 0;
-  background-color: white;
 }
 
 .selectMenu .searchInput {
@@ -66,8 +63,11 @@
 }
 
 .selectList {
+  border: 1px solid cadetblue;
+  background-color: white;
+  border-radius: 8px;
   list-style: none;
-  padding: 0;
+  padding: 8px 0;
   margin: 0;
 }
 

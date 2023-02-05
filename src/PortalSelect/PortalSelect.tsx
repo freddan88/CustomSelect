@@ -1,7 +1,6 @@
 import React, {
   useState,
   useEffect,
-  MouseEvent,
   useCallback,
   useRef,
   RefObject,
@@ -61,28 +60,6 @@ const PortalSelect: React.FC<TProps> = ({
   const selectBoxRef: RefObject<HTMLButtonElement> = useRef(null);
   const selectOptionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const renderSelectedLabel = () => {
-    if (selected.length > 0) {
-      if (multiple)
-        return (
-          <div className={styles.multiSelectBadges}>
-            {selected.map((obj) => (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSelect(true, obj);
-                }}
-              >
-                {obj.label}
-              </button>
-            ))}
-          </div>
-        );
-      return <span style={{ userSelect: "none" }}>{selected[0].label}</span>;
-    }
-    return <span className={styles.placeholder}>{placeholder}</span>;
-  };
-
   const handleSelect = (checked: boolean, option: IOption) => {
     if (multiple) {
       setSelected((prevValues) => {
@@ -95,10 +72,13 @@ const PortalSelect: React.FC<TProps> = ({
       setSelected([option]);
     }
     if (stayOpen) return;
+    if (selectBoxRef.current) {
+      selectBoxRef.current.focus();
+    }
     setIsOpen(false);
   };
 
-  const handleSelectBoxClick = (e: MouseEvent<HTMLElement>) => {
+  const handleSelectBoxClick = () => {
     if (selectBoxRef.current) {
       const selectBox = selectBoxRef.current;
       selectBoxPositions = selectBox?.getBoundingClientRect();
@@ -117,12 +97,32 @@ const PortalSelect: React.FC<TProps> = ({
   const { handleKeyboard } = useSelectFieldKeyboard(
     setHighlightedIndex,
     selectOptionRefs,
-    selectMenuRef,
-    handleSelect,
-    searchable,
-    setIsOpen,
-    isOpen
+    selectBoxRef,
+    setIsOpen
   );
+
+  const renderSelectedLabel = () => {
+    if (selected.length > 0) {
+      if (multiple)
+        return (
+          <ul className={styles.multiSelectBadges}>
+            {selected.map((obj) => (
+              <li
+                key={obj.value}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSelect(true, obj);
+                }}
+              >
+                {obj.label}
+              </li>
+            ))}
+          </ul>
+        );
+      return <span style={{ userSelect: "none" }}>{selected[0].label}</span>;
+    }
+    return <span className={styles.placeholder}>{placeholder}</span>;
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -139,7 +139,7 @@ const PortalSelect: React.FC<TProps> = ({
       ] as HTMLButtonElement;
       if (button) button.focus();
     }
-  }, [isOpen, highlightedIndex]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && selectBoxPositions && selectMenuRef.current) {
@@ -166,8 +166,10 @@ const PortalSelect: React.FC<TProps> = ({
   }, []);
 
   return (
-    <>
+    <div>
+      <label htmlFor={name}>{label}</label>
       <button
+        id={name}
         ref={selectBoxRef}
         className={isOpen ? styles.selectBoxOpen : styles.selectBox}
         onClick={handleSelectBoxClick}
@@ -225,7 +227,7 @@ const PortalSelect: React.FC<TProps> = ({
           </ul>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
