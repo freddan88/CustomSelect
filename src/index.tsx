@@ -116,7 +116,7 @@ ReactDOM.render(
         label="Test label 2"
         placeholder="välj..."
         value={1}
-        searchable={false}
+        searchable={true}
         stayOpen={false}
         options={[
           {

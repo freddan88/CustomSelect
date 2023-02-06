@@ -1,12 +1,17 @@
 import { Dispatch, KeyboardEvent, SetStateAction } from "react";
+import { IOption } from "./PortalSelect";
 
 let index = 0;
 
 export default function useSelectFieldKeyboard(
   setHighlightedIndex: Dispatch<SetStateAction<number>>,
   selectOptionRefs: React.MutableRefObject<(HTMLButtonElement | null)[]>,
+  searchedOptions: IOption[],
   selectBoxRef: React.RefObject<HTMLButtonElement>,
-  setIsOpen: Dispatch<SetStateAction<boolean>>
+  handleSelect: (checked: boolean, option: IOption) => void,
+  searchable: boolean,
+  setIsOpen: Dispatch<SetStateAction<boolean>>,
+  selected: IOption[]
 ) {
   const handleKeyboard = (e: KeyboardEvent<HTMLElement>) => {
     if (e.target instanceof HTMLInputElement) return;
@@ -32,13 +37,28 @@ export default function useSelectFieldKeyboard(
           }
           if (selectOptionRefs.current[index]) {
             const button = selectOptionRefs.current[index] as HTMLButtonElement;
-            if (button) button.focus();
+            if (button) {
+              button.focus();
+              button.scrollIntoView();
+            }
           }
           setHighlightedIndex(index);
         }
         break;
       }
       default:
+        if (!searchable) {
+          const regex = new RegExp(`^${e.key}`, "gi");
+          const option = searchedOptions.find((option) =>
+            option.label.match(regex)
+          );
+          if (option) {
+            const isSelected = Boolean(
+              selected.find((obj) => obj.value === option.value)
+            );
+            handleSelect(isSelected, option);
+          }
+        }
         break;
     }
   };

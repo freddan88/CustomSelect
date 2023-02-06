@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useRef,
   RefObject,
+  ChangeEvent,
 } from "react";
 import styles from "./portalSelect.module.css";
 import { MdUnfoldMore } from "react-icons/md";
@@ -50,7 +51,7 @@ const PortalSelect: React.FC<TProps> = ({
   multiple = false,
   searchable = false,
 }) => {
-  const [searchedOptions, setSearchedOptions] = useState<IOption[]>();
+  const [searchedOptions, setSearchedOptions] = useState<IOption[]>(options);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [selected, setSelected] = useState<IOption[]>([]);
   const [menuMargin, setMenuMargin] = useState(MENU_GAP);
@@ -60,11 +61,20 @@ const PortalSelect: React.FC<TProps> = ({
   const selectBoxRef: RefObject<HTMLButtonElement> = useRef(null);
   const selectOptionRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+  const handleSelectListSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    const matches = options.filter((option) => {
+      const regex = new RegExp(`^${query}`, "gi");
+      return option.label.match(regex);
+    });
+    setSearchedOptions(matches);
+  };
+
   const handleSelect = (checked: boolean, option: IOption) => {
     if (multiple) {
       setSelected((prevValues) => {
         if (checked) {
-          return prevValues.filter((obj) => obj.value !== option.value);
+          return prevValues.filter((obj) => obj.label !== option.label);
         }
         return [...prevValues, option];
       });
@@ -97,8 +107,12 @@ const PortalSelect: React.FC<TProps> = ({
   const { handleKeyboard } = useSelectFieldKeyboard(
     setHighlightedIndex,
     selectOptionRefs,
+    searchedOptions,
     selectBoxRef,
-    setIsOpen
+    handleSelect,
+    searchable,
+    setIsOpen,
+    selected
   );
 
   const renderSelectedLabel = () => {
@@ -143,24 +157,32 @@ const PortalSelect: React.FC<TProps> = ({
 
   useEffect(() => {
     if (isOpen && selectBoxPositions && selectMenuRef.current) {
-      const boxHeight = selectBoxPositions.height;
       const menuHeight = selectMenuRef.current.clientHeight;
-      const menuMargin = menuHeight + boxHeight + MENU_GAP + 2;
-      // setMenuMargin(-menuMargin);
-      // setMenuMargin(MENU_GAP);
+      const boxOffset = selectBoxPositions.bottom;
+      const browserHeight = window.innerHeight;
+      const positionCondition = menuHeight + MENU_GAP;
+      if (browserHeight - boxOffset < positionCondition) {
+        const boxHeight = selectBoxPositions.height;
+        const menuMargin = menuHeight + boxHeight + MENU_GAP + 2;
+        setMenuMargin(-menuMargin);
+      } else {
+        setMenuMargin(MENU_GAP);
+      }
     }
   }, [isOpen]);
 
   useEffect(() => {
     if (multiple && Array.isArray(value)) {
-      const newSelections = options.filter((option) =>
+      const newSelections = searchedOptions.filter((option) =>
         value.includes(option.value)
       );
       setSelected(newSelections);
     } else {
-      const index = options.findIndex((option) => option.value === value);
+      const index = searchedOptions.findIndex(
+        (option) => option.value === value
+      );
       if (index > 0) {
-        setSelected([options[index]]);
+        setSelected([searchedOptions[index]]);
       }
     }
   }, []);
@@ -196,11 +218,12 @@ const PortalSelect: React.FC<TProps> = ({
                 type="search"
                 placeholder="Search..."
                 className={styles.searchInput}
+                onChange={handleSelectListSearch}
               />
             </div>
           )}
           <ul className={styles.selectList}>
-            {options.map((option, index) => {
+            {searchedOptions.map((option, index) => {
               let isSelected = false;
               if (selected.length > 0) {
                 isSelected = Boolean(
