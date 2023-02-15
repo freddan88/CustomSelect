@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import CustomSelect from "./CustomSelect/CustomSelect";
@@ -6,6 +6,8 @@ import reportWebVitals from "./reportWebVitals";
 import InputFieldSelect from "./inputFields/inputFieldSelect/InputFieldSelect";
 import SingleSelectField from "./SingleSelect/SingleSelectField";
 import PortalSelect from "./PortalSelect/PortalSelect";
+import DropdownBodyTemplate from "./DropdownTemplates/DropdownBody";
+import DropdownSelect from "./DrodownSelect/DropdownSelect";
 
 const array = [
   {
@@ -134,6 +136,9 @@ ReactDOM.render(
         ]}
       />
     </div>
+    <br />
+    <br />
+    <DropdownSelect />
     <br />
     <br />
   </React.StrictMode>,
